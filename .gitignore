@@ -104,3 +104,8 @@ ENV/
 # BBEdit
 
 *.bbprojectd/
+
+# PyCharm
+.idea/
+
+*.orig
