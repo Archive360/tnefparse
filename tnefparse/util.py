@@ -5,7 +5,7 @@ import struct
 import sys
 import uuid
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 if sys.hexversion < 0x03000000:
     range = xrange
@@ -45,7 +45,11 @@ HUNDREDS_OF_NANOSECONDS = 10000000
 
 def systime(byte_arr, offset=0):
     ft = uint64(byte_arr, offset)
-    return datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)
+    try:
+        return (datetime.utcfromtimestamp((ft - EPOCH_AS_FILETIME) / HUNDREDS_OF_NANOSECONDS)).replace(tzinfo=timezone.utc)
+    except OSError:
+        microseconds = ft / 10
+        return (datetime(1601, 1, 1, tzinfo=timezone.utc) + timedelta(microseconds=microseconds)).replace(tzinfo=timezone.utc)
 
 
 def apptime(byte_arr, offset=0):
